@@ -1,45 +1,98 @@
+/**********************************************************************
+ *
+ * Astrophysical Speed Test : mp2
+ *
+ * AUTHOR        : Paul Salanitri
+ * REVISION      : 2.02
+ * REVISION DATE : 2 November 1996
+ * NOTES         : For Unix systems - define USE_TIME
+ *                 Will now loop until timer ticks over (on PCs too)
+ *
+ * MODIFICATIONS :
+ *          2.02 : fix spelling of Astrophysical!
+ *          2.01 : First release - tested on Sun and Sequent (mods)
+ *          1.00 : Source Code Lost!!!!
+ **********************************************************************/
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
 
+/* do this for Unix systems */
+#define USE_TIME
 /*#define double long double*/
-
 long int count;
-
 time_t now,then;
 int printout=0;
 
-main(int argc, char * argv[])
+
+main(argc,argv)
+int argc;
+char * argv[];
 {
   int i;
 
-  printf("Astrophysical Speed test V 2.01 : Ten second sample...\n");
+  printf("Astrophysical Speed test V 2.02\n");
   printf("Paul Salanitri (c) 1996 Futex\n");
+  printf("Use -h to display help\n");
   if (argc>1) {
 	if (argv[1][0]=='/' || argv[1][0]=='-') {
 	  if (tolower(argv[1][1])=='h') {
-		printf("%s [-s|-h]\n",argv[0]);
+		printf("%s [-s|-h|-n]\n",argv[0]);
 		printf("  -s : print solution\n");
+		printf("  -n : print notes and comparisons\n\n");
+		printf("Notes on test\n");
+		printf("-------------\n");
+		printf("Precision is double\n");
+		printf("Calculation is an harmonic solution to the position of the moon\n");
+		printf("Comparitive figures: (per cpu)\n");
+
+		printf("  10 MHz XT (no 87)    :      1.0\n");
+		printf("  12 MHz AT 286        :      3.0\n");
+		printf("  4.77 MHz XT +87      :      8.0\n");
+		printf("  486DX2-66MHz         :    800.0\n");
+		printf("  Sun Station10/50 MHz :   2000.0\n");
+		printf("  100 MHz Pentium      :   3900.0\n");
+		printf("Post your stats to contpgs@citec.qld.gov.au\n  or 100240.1707@compuserve.com\n");
+		printf("Source code available on request\n");
 		exit(1);
 	  } else if (tolower(argv[1][1])=='s') {
 		printout=1;
 		calc_moon(2450000.0);
 		exit(0);
+	  } else if (tolower(argv[1][1])=='n') {
+		printf("No notes yet.\n");
 	  }
 	} else {
 	}
   }
+  printf("\nTaking Ten second sample...\n");
   count=0L;
+#ifdef USE_TIME
+  time(&then);
+  /* wait for second to tick over */
+  while(1) {
+	time(&now);
+	if (now!=then) break;
+  }
+  /* use this second */
+  then=now;
+#else
   then=clock();
+#endif
 
   while (1) {
 /*	calc_moon(2415020.0);*/
 /*	calc_moon(2450000.0); */
 /*	calc_moon(2450000.0 + (double)count);*/
-	calc_moon((long double)((double)2450000.0 + (double)count));
+	calc_moon((double)2450000.0 + (double)count);
 	count++;
+#ifdef USE_TIME
+	time(&now);
+	if (now-then>=10) break;
+#else
 	now=clock();
 	if (now-then>=CLK_TCK*10) break;
+#endif
   }
 
 
@@ -48,8 +101,13 @@ main(int argc, char * argv[])
   exit(0);
 }
 
+/***
+This is not allowed on Sun
 const double dtor=180.0/M_PI;
 const double AU=1.0;
+****/
+double dtor=180.0/M_PI;
+double AU=1.0;
 
 calc_moon(JD)
 double JD;
@@ -195,22 +253,7 @@ double JD;
 	}
 }
 
-
-/*
-Moon Position numerical
-16800 GOTO16830:REMii=-5.145*sin(2*ã*(td-181.5833)/27.21222)
-16802 ii=-5.1454*SIN(2*ã*(td+4336.5382)/27.21222)
-16810 REMm=(td-181.5833)/27.321661:m=(m-int(m))*360+230.138851
-16812 m=(td-4.903472222)/27.321661:m=(m-INT(m))*360+58.843643
-16814 REMm=(td+4336.5382)/27.32158:m=(m-int(m))*360+98.6496618
-16820 ha(n)=m:hp(n)=ii:ga(n)=m:gp(n)=ii:GOTO2140
-!
-16830 nm=dc-2436935+(h0+m0/60)/24:m=nm/27.321582+311.1687/360:m=(m-INT(m))*360:PRINT"m="m"";                         :REM (582)
-16835 REMpg=(m-(nm*.111404+255.7433))/360:pg=(pg-int(pg))*360:print"(m-)pg="pg;
-16840 m=m+ 6.2886*SIN((m-(nm*.111404+255.7433))/kk)
-16850 REMm=m+dr
-16860 ii=5.1454*SIN((m-178.699+nm*.052954)/kk)
-16861 PRINT"dc=";dc;"m="m;"inc"ii
-16862 :   :GOTO16820
-*/
+/*********/
+/** END **/
+/*********/
 
