@@ -9,37 +9,72 @@
  *                 Will now loop until timer ticks over (on PCs too)
  *
  * MODIFICATIONS :
+ *          2.03 : Test timing overhead
  *          2.02 : fix spelling of Astrophysical!
  *          2.01 : First release - tested on Sun and Sequent (mods)
  *          1.00 : Source Code Lost!!!!
  **********************************************************************/
+#define VERSION "2.03"
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
 
 /* do this for Unix systems */
-#define USE_TIME
+/*#define USE_TIME*/
 /*#define double long double*/
+#ifdef USE_TIME
+#define VTYPE ""
+#else
+#define VTYPE "c"
+#endif
 long int count;
 time_t now,then;
 int printout=0;
-
+int test_timing=0;
 
 main(argc,argv)
 int argc;
 char * argv[];
 {
   int i;
+  int print_info;
+  int finish;
 
-  printf("Astrophysical Speed test V 2.02\n");
+  print_info=0;
+  print_info=1;
+  finish=0;
+  printf("Astrophysical Speed test V %s%s\n",VERSION,VTYPE);
   printf("Paul Salanitri (c) 1996 Futex\n");
   printf("Use -h to display help\n");
   if (argc>1) {
 	if (argv[1][0]=='/' || argv[1][0]=='-') {
 	  if (tolower(argv[1][1])=='h') {
-		printf("%s [-s|-h|-n]\n",argv[0]);
+		print_info=1;
+		finish=1;
+	  } else if (tolower(argv[1][1])=='i') {
+		print_info=1;
+	  } else if (tolower(argv[1][1])=='s') {
+		printout=1;
+		calc_moon(2450000.0);
+		exit(0);
+	  } else if (tolower(argv[1][1])=='n') {
+#ifdef USE_TIME
+		printf("Using time(&...) mechanism\n");
+#else
+		printf("Using clock() mechanism\n");
+#endif
+		exit(2);
+	  } else if (tolower(argv[1][1])=='t') {
+		test_timing=1;
+	  }
+	} else {
+	}
+  }
+  if (print_info) {
+		printf("%s [-s|-h|-i|-n|-t]\n",argv[0]);
 		printf("  -s : print solution\n");
-		printf("  -n : print notes and comparisons\n\n");
+		printf("  -n : print notes and comparisons\n");
+		printf("  -t : test timing overhead\n\n");
 		printf("Notes on test\n");
 		printf("-------------\n");
 		printf("Precision is double\n");
@@ -49,23 +84,17 @@ char * argv[];
 		printf("  10 MHz XT (no 87)    :      1.0\n");
 		printf("  12 MHz AT 286        :      3.0\n");
 		printf("  4.77 MHz XT +87      :      8.0\n");
-		printf("  486DX2-66MHz         :    800.0\n");
+		printf("  486DX2-66MHz         :    970.0\n");
 		printf("  Sun Station10/50 MHz :   2000.0\n");
-		printf("  100 MHz Pentium      :   3900.0\n");
-		printf("Post your stats to contpgs@citec.qld.gov.au\n  or 100240.1707@compuserve.com\n");
+		printf("  100 MHz Pentium      :   3900.0\n\n");
+		printf("Post your stats to contpgs@citec.qld.gov.au or 100240.1707@compuserve.com\n");
 		printf("Source code available on request\n");
-		exit(1);
-	  } else if (tolower(argv[1][1])=='s') {
-		printout=1;
-		calc_moon(2450000.0);
-		exit(0);
-	  } else if (tolower(argv[1][1])=='n') {
-		printf("No notes yet.\n");
-	  }
-	} else {
-	}
   }
-  printf("\nTaking Ten second sample...\n");
+  if (finish) {
+		exit(1);
+  }
+  if (!test_timing) printf("\nTaking Ten second sample...\n");
+  else printf("\nTesting the timing mechanism...\n");
   count=0L;
 #ifdef USE_TIME
   time(&then);
@@ -76,8 +105,28 @@ char * argv[];
   }
   /* use this second */
   then=now;
+  if (test_timing) {
+	while(1) {
+	  count++;
+	  time(&now);
+	  if (now!=then) break;
+	}
+	printf("Timing counts per second : %ld\n",count);
+	printf("Overhead time            : %10.6f usec\n",1.0/count*1000000.0);
+	exit(0);
+  }
 #else
   then=clock();
+  if (test_timing) {
+	while(1) {
+	  count++;
+	  now=clock();
+	  if (now-then>=CLK_TCK*1) break;
+	}
+	printf("Timing counts per second : %ld\n",count);
+	printf("Overhead time            : %10.6f usec\n",1.0/count*1000000.0);
+	exit(0);
+  }
 #endif
 
   while (1) {
@@ -98,6 +147,10 @@ char * argv[];
 
   printf("Calculations per second : %16.4f\n",count/10.0);
   printf("Calculations time       : %10.6f usec\n",10.0/count*1000000.0);
+  if (print_info) {
+	printf("\nHit any key...\n");
+	getch();
+  }
   exit(0);
 }
 
@@ -256,4 +309,3 @@ double JD;
 /*********/
 /** END **/
 /*********/
-
