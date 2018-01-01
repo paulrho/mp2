@@ -16,6 +16,8 @@
  **********************************************************************/
 #define VERSION "2.03"
 #include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
 #include <math.h>
 #include <time.h>
 
@@ -31,8 +33,9 @@ long int count;
 time_t now,then;
 int printout=0;
 int test_timing=0;
+void calc_moon();
 
-main(argc,argv)
+void main(argc,argv)
 int argc;
 char * argv[];
 {
@@ -164,7 +167,7 @@ const double AU=1.0;
 double dtor=180.0/M_PI;
 double AU=1.0;
 
-calc_moon(JD)
+void calc_moon(JD)
 double JD;
 {
 
