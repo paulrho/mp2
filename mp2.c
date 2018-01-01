@@ -20,7 +20,7 @@
 #include <time.h>
 
 /* do this for Unix systems */
-/*#define USE_TIME*/
+#define USE_TIME
 /*#define double long double*/
 #ifdef USE_TIME
 #define VTYPE ""
@@ -149,7 +149,9 @@ char * argv[];
   printf("Calculations time       : %10.6f usec\n",10.0/count*1000000.0);
   if (print_info) {
 	printf("\nHit any key...\n");
+#ifndef USE_TIME
 	getch();
+#endif
   }
   exit(0);
 }
