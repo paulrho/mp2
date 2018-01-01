@@ -47,7 +47,7 @@ char * argv[];
   print_info=1;
   finish=0;
   printf("Astrophysical Speed test V %s%s\n",VERSION,VTYPE);
-  printf("Paul Salanitri (c) 1996 Futex\n");
+  printf("Paul Salanitri (c) 1996-2018 Futex\n");
   printf("Use -h to display help\n");
   if (argc>1) {
 	if (argv[1][0]=='/' || argv[1][0]=='-') {
@@ -89,8 +89,11 @@ char * argv[];
 		printf("  4.77 MHz XT +87      :      8.0\n");
 		printf("  486DX2-66MHz         :    970.0\n");
 		printf("  Sun Station10/50 MHz :   2000.0\n");
-		printf("  100 MHz Pentium      :   3900.0\n\n");
-		printf("Post your stats to contpgs@citec.qld.gov.au or 100240.1707@compuserve.com\n");
+		printf("  100 MHz Pentium      :   3900.0\n");
+		printf("  433 MHz Celeron      :  16400.0\n");
+		printf("  Raspberry Pi 3   -O3 :  45000.0 *4\n");
+		printf("  i5 2.6GHz Lenova -O3 : 122000.0 *4\n");
+		printf("\nPost your stats to mp2@futex.com.au\n");
 		printf("Source code available on request\n");
   }
   if (finish) {
