@@ -11,7 +11,7 @@ gcc -O3 -lm -o mp2 mp2.c
 For unix set USE_TIME
 For turbo C - comment out USE_TIME
 <PRE>
-otes on test
+Notes on test
 -------------
 Precision is double
 Calculation is an harmonic solution to the position of the moon
